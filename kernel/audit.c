@@ -1312,9 +1312,8 @@ static void __net_exit audit_net_exit(struct net *net)
 		auditd_reset();
 	mutex_unlock(&audit_cmd_mutex);
 
-	RCU_INIT_POINTER(aunet->nlsk, NULL);
-	synchronize_net();
 	netlink_kernel_release(sock);
+	aunet->nlsk = NULL;
 }
 
 static struct pernet_operations audit_net_ops __net_initdata = {
