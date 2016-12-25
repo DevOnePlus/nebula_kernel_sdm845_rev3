@@ -2378,7 +2378,7 @@ static void sde_crtc_vblank_cb(void *data)
 	struct sde_crtc *sde_crtc = to_sde_crtc(crtc);
 
 	/* keep statistics on vblank callback - with auto reset via debugfs */
-	if (ktime_equal(sde_crtc->vblank_cb_time, ktime_set(0, 0)))
+	if (ktime_equal(sde_crtc->vblank_cb_time, 0))
 		sde_crtc->vblank_cb_time = ktime_get();
 	else
 		sde_crtc->vblank_cb_count++;
@@ -2799,7 +2799,7 @@ ssize_t oneplus_display_notify_fp_press(struct device *dev,
 	crtc_state = drm_atomic_get_crtc_state(state, crtc);
 	priv = drm_dev->dev_private;
 	now = ktime_get();
-	need_commit = (((now.tv64 - priv->commit_end_time.tv64) > 20000000 ? true:false)&&display->panel->aod_status==0);
+	need_commit = (((now - priv->commit_end_time) > 20000000 ? true:false)&&display->panel->aod_status==0);
 
 	if(need_commit){
 	err = drm_atomic_commit(state);
@@ -3269,7 +3269,7 @@ static void _sde_crtc_wait_for_fences(struct drm_crtc *crtc)
 	drm_atomic_crtc_for_each_plane(plane, crtc) {
 		do {
 			kt_wait = ktime_sub(kt_end, ktime_get());
-			if (ktime_compare(kt_wait, ktime_set(0, 0)) >= 0)
+			if (ktime_compare(kt_wait, 0) >= 0)
 				wait_ms = ktime_to_ms(kt_wait);
 			else
 				wait_ms = 0;
@@ -6073,7 +6073,7 @@ static int _sde_debugfs_status_show(struct seq_file *s, void *data)
 
 		/* reset time & count for next measurement */
 		sde_crtc->vblank_cb_count = 0;
-		sde_crtc->vblank_cb_time = ktime_set(0, 0);
+		sde_crtc->vblank_cb_time = 0;
 	}
 
 	seq_printf(s, "vblank_enable:%d\n", sde_crtc->vblank_requested);
