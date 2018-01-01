@@ -1683,7 +1683,7 @@ bool key_home_pressed =0;
 extern bool virtual_key_enable;
 #endif
 
-static inline void __int_touch(void)
+static inline void int_touch(void)
 {
 	int ret = -1,i = 0;
 	uint8_t buf[90];
@@ -1710,7 +1710,6 @@ static inline void __int_touch(void)
 	points.z = 0;
 	points.status = 0;
 
-	mutex_lock(&ts->mutexreport);
 #ifdef REPORT_2D_PRESSURE
     if (ts->support_ft){
         ret = i2c_smbus_write_byte_data(ts->client, 0xff, 0x4);
@@ -1718,7 +1717,7 @@ static inline void __int_touch(void)
             sizeof(points.pressure), &points.pressure);
         if (ret < 0) {
             TPD_ERR("synaptics_int_touch: i2c_transfer failed\n");
-            goto INT_TOUCH_END;
+            return;
         }
         if (0 == points.pressure)//workaround for have no pressure value input reader into hover mode
         {
@@ -1742,7 +1741,7 @@ static inline void __int_touch(void)
 	ret = synaptics_rmi4_i2c_read_block(ts->client, F12_2D_DATA15, 2, object_attention);
     if (ret < 0) {
         TPD_ERR("synaptics_int_touch F12_2D_DATA15: i2c_transfer failed\n");
-        goto INT_TOUCH_END;
+        return;
     }
 	total_status = (object_attention[1] << 8) | object_attention[0];
 
@@ -1756,12 +1755,12 @@ static inline void __int_touch(void)
 	}
         if(count_data > 10){
             TPD_ERR("count_data is: %d\n", count_data);
-            goto INT_TOUCH_END;
+            return;
         }
 	ret = synaptics_rmi4_i2c_read_block(ts->client, F12_2D_DATA_BASE, count_data*8+1, buf);
 	if (ret < 0) {
 		TPD_ERR("synaptics_int_touch F12_2D_DATA_BASE: i2c_transfer failed\n");
-		goto INT_TOUCH_END;
+		return;
 	}
 	for( i = 0; i < count_data; i++ ) {
 		points.status = buf[i*8];
@@ -1899,14 +1898,6 @@ static inline void __int_touch(void)
 		if (!ts->en_up_down)
 			tp_baseline_get(ts, false);
 	}
-
-INT_TOUCH_END:
-	mutex_unlock(&ts->mutexreport);
-}
-
-void int_touch(void)
-{
-	__int_touch();
 }
 
 static char log_count = 0;
@@ -2065,7 +2056,7 @@ static void synaptics_ts_work_func(struct work_struct *work)
 		}
 	#endif
 	} else {
-		__int_touch();
+		int_touch();
 	}
 	}
 	if( inte & 0x10 ){
