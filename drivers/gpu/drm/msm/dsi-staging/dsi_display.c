@@ -36,21 +36,10 @@
 #include <linux/msm_drm_notify.h>
 #include <linux/notifier.h>
 #include <linux/sched.h>
-#include <linux/pm_qos.h>
-#include <linux/cpufreq.h>
-#include <linux/pm_wakeup.h>
 #include "../sde/sde_trace.h"
 
-#define BIG_CPU_NUMBER 4
-#if defined(CONFIG_ARCH_SDM845)
-#define LCDSPEEDUP_BIG_CPU_QOS_FREQ    2649600
-#elif defined(CONFIG_ARCH_MSM8998)
-#define LCDSPEEDUP_BIG_CPU_QOS_FREQ    2361600
-#elif defined(CONFIG_ARCH_MSM8996)
-#define LCDSPEEDUP_BIG_CPU_QOS_FREQ    2073600
-#endif
-#define LCD_QOS_TIMEOUT 1000000
-#define NO_BOOST        0
+int backlight_min = 0;
+module_param(backlight_min, int, 0644);
 
 #define to_dsi_bridge(x)  container_of((x), struct dsi_bridge, base)
 
