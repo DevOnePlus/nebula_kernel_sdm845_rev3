@@ -79,6 +79,7 @@
 #include <linux/kcov.h>
 #include <linux/safestack.h>
 #include <linux/cpufreq_times.h>
+#include <linux/cpu_input_boost.h>
 
 #include <asm/pgtable.h>
 #include <asm/pgalloc.h>
