@@ -5386,8 +5386,6 @@ int dsi_display_get_modes(struct dsi_display *display,
 	if (display->modes)
 		goto exit;
 
-	mutex_lock(&display->display_lock);
-
 	rc = dsi_display_get_mode_count_no_lock(display, &total_mode_count);
 	if (rc)
 		goto error;
