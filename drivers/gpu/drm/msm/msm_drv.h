@@ -200,7 +200,6 @@ enum msm_mdp_conn_property {
 
 	/* total # of properties */
 	CONNECTOR_PROP_COUNT
-	
 };
 
 #define MAX_H_TILES_PER_DISPLAY 2
