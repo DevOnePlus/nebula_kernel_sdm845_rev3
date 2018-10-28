@@ -5942,6 +5942,9 @@ static int synaptics_ts_probe(struct i2c_client *client, const struct i2c_device
 		goto err_alloc_data_failed;
 	}
 
+	pm_qos_add_request(&ts->pm_qos_req, PM_QOS_CPU_DMA_LATENCY,
+		PM_QOS_DEFAULT_VALUE);
+
 	ts->client = client;
 	i2c_set_clientdata(client, ts);
 	ts->dev = &client->dev;
@@ -6222,8 +6225,6 @@ static int synaptics_ts_probe(struct i2c_client *client, const struct i2c_device
 	}
 #endif
 	init_synaptics_proc();
-	pm_qos_add_request(&ts->pm_qos_req, PM_QOS_CPU_DMA_LATENCY,
-		PM_QOS_DEFAULT_VALUE);
 
 #ifdef WAKE_GESTURES
 	gl_ts = ts;
@@ -6301,6 +6302,7 @@ err_alloc_data_failed:
 	kfree(rmi4_data_s3706);
 	rmi4_data_s3706 = NULL;
 	ts_g = NULL;
+	pm_qos_remove_request(&ts->pm_qos_req);
 	TPD_ERR("synaptics_ts_probe: not normal end\n");
 	return ret;
 }
