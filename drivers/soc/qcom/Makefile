@@ -45,7 +45,10 @@ obj-$(CONFIG_MSM_SMD)	+= msm_smd.o smd_debug.o smd_private.o smd_init_dt.o smsm_
 else
 obj-$(CONFIG_MSM_SMD)	+= msm_smd.o smd_private.o smd_init_dt.o
 endif
-obj-$(CONFIG_MSM_GLINK) += glink.o glink_debugfs.o glink_ssr.o
+obj-$(CONFIG_MSM_GLINK) += glink.o glink_ssr.o
+ifdef CONFIG_DEBUG_FS
+obj-$(CONFIG_MSM_GLINK) += glink_debugfs.o
+endif
 obj-$(CONFIG_MSM_TZ_SMMU) += msm_tz_smmu.o
 obj-$(CONFIG_MSM_GLINK_LOOPBACK_SERVER) += glink_loopback_server.o
 obj-$(CONFIG_MSM_GLINK_BGCOM_XPRT) += glink_bgcom_xprt.o
