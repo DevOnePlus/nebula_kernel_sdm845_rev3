@@ -37,7 +37,7 @@
 #include <linux/interrupt.h>
 #include <linux/irq.h>
 #include <linux/proc_fs.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 /*modify by morgan.gu for sdm845 */
 #undef CONFIG_FB
@@ -476,7 +476,7 @@ extern int gt1x_parse_chr_cfg(int sensor_id);
 
 #ifdef CONFIG_MTK_PLATFORM
 /* MTK platform */
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #ifdef CONFIG_MTK_BOOT
 #include "mt_boot_common.h"
 #endif
