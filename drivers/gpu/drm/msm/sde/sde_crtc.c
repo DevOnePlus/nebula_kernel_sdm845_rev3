@@ -4046,6 +4046,11 @@ void sde_crtc_commit_kickoff(struct drm_crtc *crtc,
 
 	SDE_ATRACE_BEGIN("crtc_commit");
 
+#ifdef CONFIG_CPU_INPUT_BOOST
+	if (time_before(jiffies, last_input_jiffies + msecs_to_jiffies(5000)))
+		cpu_input_boost_kick_general(100);
+#endif
+
 	is_error = _sde_crtc_prepare_for_kickoff_rot(dev, crtc);
 
 	idle_pc_state = sde_crtc_get_property(cstate, CRTC_PROP_IDLE_PC_STATE);
