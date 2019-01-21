@@ -5683,6 +5683,7 @@ static void fg_cleanup(struct fg_chip *chip)
 
 	if (chip->fg_psy)
 		power_supply_unregister(chip->fg_psy);
+
 	power_supply_unreg_notifier(&chip->nb);
 	qpnp_misc_twm_notifier_unregister(&chip->twm_nb);
 	cancel_delayed_work_sync(&chip->ttf_work);

@@ -2854,6 +2854,12 @@ static void sde_encoder_virt_disable(struct drm_encoder *drm_enc)
 	}
 
 
+	if (sde_enc->input_handler && sde_enc->input_handler_registered) {
+		input_unregister_handler(sde_enc->input_handler);
+		sde_enc->input_handler_registered = false;
+	}
+
+
 	/* wait for idle */
 	sde_encoder_wait_for_event(drm_enc, MSM_ENC_TX_COMPLETE);
 
@@ -3334,11 +3340,16 @@ static void _sde_encoder_kickoff_phys(struct sde_encoder_virt *sde_enc)
 	unsigned long lock_flags;
 	struct msm_drm_private *priv = NULL;
 	struct sde_kms *sde_kms = NULL;
+	bool is_vid_mode = false;
 
 	if (!sde_enc) {
 		SDE_ERROR("invalid encoder\n");
 		return;
 	}
+
+	is_vid_mode = sde_enc->disp_info.capabilities &
+					MSM_DISPLAY_CAP_VID_MODE;
+
 
 	pending_flush = 0x0;
 
@@ -3348,7 +3359,6 @@ static void _sde_encoder_kickoff_phys(struct sde_encoder_virt *sde_enc)
 	 */
 	for (i = 0; i < sde_enc->num_phys_encs; i++) {
 		struct sde_encoder_phys *phys = sde_enc->phys_encs[i];
-		bool wait_for_dma = false;
 
 		if (!phys || phys->enable_state == SDE_ENC_DISABLED)
 			continue;
@@ -3357,12 +3367,10 @@ static void _sde_encoder_kickoff_phys(struct sde_encoder_virt *sde_enc)
 		if (!ctl)
 			continue;
 
-		if (phys->ops.wait_dma_trigger)
-			wait_for_dma = phys->ops.wait_dma_trigger(phys);
-
+		/* make reg dma kickoff as blocking for vidoe-mode */
 		if (phys->hw_ctl->ops.reg_dma_flush)
 			phys->hw_ctl->ops.reg_dma_flush(phys->hw_ctl,
-					wait_for_dma);
+					is_vid_mode);
 	}
 
 	/* update pending counts and trigger kickoff ctl flush atomically */
