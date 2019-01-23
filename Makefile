@@ -350,7 +350,7 @@ POLLY_FLAGS	:= -mllvm -polly \
 		   -mllvm -polly-vectorizer=stripmine
 
 OPT_FLAGS	:= -mcpu=kryo -funsafe-math-optimizations -ffast-math \
-		   -fvectorize -fslp-vectorize -fopenmp $(POLLY_FLAGS)
+		   -fvectorize -fslp-vectorize -lgomp -fopenmp $(POLLY_FLAGS)
 endif
 
 # Make variables (CC, etc...)
