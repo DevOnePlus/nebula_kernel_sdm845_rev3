@@ -297,8 +297,8 @@ static void input_boost_worker(struct kthread_work *work)
 
 static void input_unboost_worker(struct work_struct *work)
 {
-	struct boost_drv *b =
-		container_of(to_delayed_work(work), typeof(*b), input_unboost);
+	struct boost_drv *b = container_of(to_delayed_work(work),
+					   typeof(*b), input_unboost);
 	u32 state = get_boost_state(b);
 
 	clear_boost_bit(b, INPUT_BOOST);
@@ -326,8 +326,8 @@ static void max_boost_worker(struct kthread_work *work)
 
 static void max_unboost_worker(struct work_struct *work)
 {
-	struct boost_drv *b =
-		container_of(to_delayed_work(work), typeof(*b), max_unboost);
+	struct boost_drv *b = container_of(to_delayed_work(work),
+					   typeof(*b), max_unboost);
 	u32 state = get_boost_state(b);
 
 	clear_boost_bit(b, MAX_BOOST);
@@ -355,8 +355,8 @@ static void general_boost_worker(struct kthread_work *work)
 
 static void general_unboost_worker(struct work_struct *work)
 {
-	struct boost_drv *b =
-		container_of(to_delayed_work(work), typeof(*b), general_unboost);
+	struct boost_drv *b = container_of(to_delayed_work(work),
+					   typeof(*b), general_unboost);
 	u32 state = get_boost_state(b);
 
 	clear_boost_bit(b, GENERAL_BOOST);
@@ -428,6 +428,8 @@ static int msm_drm_notifier_cb(struct notifier_block *nb,
 			           display_stune_boost, &b->display_stune_slot);
 		update_stune_boost(b, state, DISPLAY_BG_STUNE_BOOST, ST_BG,
 			           display_bg_stune_boost, &b->display_bg_stune_slot);
+
+		__cpu_input_boost_kick_max(b, CONFIG_WAKE_BOOST_DURATION_MS);
 	} else {
 		clear_boost_bit(b, SCREEN_AWAKE);
 		clear_stune_boost(b, state, DISPLAY_STUNE_BOOST, ST_TA,
@@ -605,7 +607,7 @@ static int __init cpu_input_boost_init(void)
 	b->msm_drm_notif.priority = INT_MAX;
 	ret = msm_drm_register_client(&b->msm_drm_notif);
 	if (ret) {
-		pr_err("Failed to register dsi_panel_notifier, err: %d\n", ret);
+		pr_err("Failed to register msm_drm notifier, err: %d\n", ret);
 		goto unregister_handler;
 	}
 
