@@ -61,25 +61,28 @@ struct vmalloc_info {
 	unsigned long	largest_chunk;
 };
 
-#ifdef CONFIG_DEBUG_FS
+
 void backtrace_test_saved(void)
 {
+#ifdef CONFIG_DEBUG_FS
 	struct stack_trace trace;
+#endif
 	unsigned long entries[8];
 
 	pr_info("\nThe following trace is a kernel self test and not a bug!\n");
-
+#ifdef CONFIG_DEBUG_FS
 	trace.nr_entries = 0;
 	trace.max_entries = ARRAY_SIZE(entries);
 	trace.entries = entries;
 	trace.skip = 0;
-
+#endif
 	pr_info("Testing a dump_stack.\n");
 	dump_stack();
 	pr_info("Testing a print_stack_trace.\n");
+#ifdef CONFIG_DEBUG_FS
 	print_stack_trace(&trace, 0);
-}
 #endif
+}
 
 void tasks_mem_get(
 struct mm_struct *mm, unsigned long *vsize, unsigned long *vrss)
@@ -388,7 +391,6 @@ static long otracer_ioctl(struct file *filp,
 
 		if (cmdv & IOCTL_OTRACER_TOLCD)
 			cmdv &= (~IOCTL_OTRACER_TOLCD);
-
 #ifdef CONFIG_DEBUG_FS
 		if (cmdv & IOCTL_OTRACER_STACK) {
 			backtrace_test_saved();
