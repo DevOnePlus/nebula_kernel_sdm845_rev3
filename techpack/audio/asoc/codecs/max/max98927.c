@@ -338,12 +338,11 @@ struct param_info {
     int q_val;
 };
 
+#endif
 
 //MULTIPLE = 3.33,  rdc/(1<<27) * MULTIPLE = [min, max] ohm
 #define RDC_MIN  (241833636)  //1.801801 * (1<<27), 1.801801 * MULTIPLE = 6 ohm
 #define RDC_MAX  (403056239)  //3.003003 * (1<<27), 3.003003 * MULTIPLE = 10 ohm
-
-#endif
 
 static uint32_t gParam[PKG_HEADER+PAYLOAD_COUNT];
 
@@ -421,7 +420,6 @@ static struct miscdevice dsm_ctrl_miscdev = {
 };
 #endif
 
-#ifdef CONFIG_DEBUG_FS
 /* max. length of a alsa mixer control name */
 #define MAX_CONTROL_NAME        48
 #define CALIBRATE_FILE   "/persist/spkr_calibration.bin"
@@ -577,6 +575,7 @@ exit:
     return ret;
 }
 
+#ifdef CONFIG_DEBUG_FS
 static ssize_t max989xx_dbgfs_impedance_read(struct file *file,
                      char __user *user_buf, size_t count,
                      loff_t *ppos)
@@ -625,6 +624,7 @@ exit:
 
     return ret;
 }
+#endif
 
 static struct snd_kcontrol_new max98927_at_controls[] = {
 	{
@@ -730,6 +730,8 @@ struct dsm_info_t {
 	int32_t maxRdcQ27[2];      //Q27,                 valid floating-point range = [0, 16)
 	int32_t minRdcQ27[2];      //Q27
 };
+
+#ifdef CONFIG_DEBUG_FS
 static ssize_t max989xx_dbgfs_info_read(struct file *file,
                      char __user *user_buf, size_t count,
                      loff_t *ppos)
