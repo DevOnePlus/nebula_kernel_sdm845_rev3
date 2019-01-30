@@ -561,11 +561,11 @@ static int __init cpu_input_boost_init(void)
 	}
 
 	ret = sched_setscheduler(b->worker_thread, SCHED_FIFO, &param);
-	if (!ret)
+	if (ret)
 		pr_err("Failed to set SCHED_FIFO on kworker, err: %d\n", ret);
 
-	/* Init the cpumask */
-	for (i = 0; i <= 2; i++)
+	/* Init the cpumask: 1-3 inclusive */
+	for (i = 1; i <= 3; i++)
 		cpumask_set_cpu(i, &sys_bg_mask);
 
 	/* Bind it to the cpumask */
