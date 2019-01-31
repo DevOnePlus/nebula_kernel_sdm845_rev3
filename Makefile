@@ -347,7 +347,10 @@ POLLY_FLAGS	:= -mllvm -polly \
 		   -mllvm -polly-opt-fusion=max \
 		   -mllvm -polly-ast-use-context \
 		   -mllvm -polly-detect-keep-going \
-		   -mllvm -polly-vectorizer=stripmine
+		   -mllvm -polly-vectorizer=stripmine \
+		   -mllvm -polly-opt-maximize-bands=yes \
+		   -mllvm -polly-opt-simplify-deps=no \
+		   -mllvm -polly-rtc-max-arrays-per-group=40
 
 OPT_FLAGS	:= -mcpu=kryo -funsafe-math-optimizations -ffast-math \
 		   -fvectorize -fslp-vectorize -lgomp -fopenmp $(POLLY_FLAGS)
