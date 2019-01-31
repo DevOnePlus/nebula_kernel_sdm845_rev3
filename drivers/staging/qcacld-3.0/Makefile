@@ -1,5 +1,8 @@
 KERNEL_SRC ?= /lib/modules/$(shell uname -r)/build
 
+ccflags-y += -fopenmp -mllvm -polly-no-parallel -lgomp
+
+
 # The Make variable $(M) must point to the directory that contains the module
 # source code (which includes this Makefile). It can either be an absolute or a
 # relative path. If it is a relative path, then it must be relative to the
@@ -30,3 +33,4 @@ modules_install:
 
 clean:
 	$(MAKE) -C $(KERNEL_SRC) M=$(M) clean
+
