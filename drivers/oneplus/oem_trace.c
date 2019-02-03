@@ -61,7 +61,7 @@ struct vmalloc_info {
 	unsigned long	largest_chunk;
 };
 
-
+#ifdef CONFIG_STACKTRACE
 void backtrace_test_saved(void)
 {
 	struct stack_trace trace;
@@ -79,6 +79,12 @@ void backtrace_test_saved(void)
 	pr_info("Testing a print_stack_trace.\n");
 	print_stack_trace(&trace, 0);
 }
+#else
+static void backtrace_test_saved(void)
+{
+	pr_info("Saved backtrace test skipped.\n");
+}
+#endif
 
 void tasks_mem_get(
 struct mm_struct *mm, unsigned long *vsize, unsigned long *vrss)
@@ -387,7 +393,7 @@ static long otracer_ioctl(struct file *filp,
 
 		if (cmdv & IOCTL_OTRACER_TOLCD)
 			cmdv &= (~IOCTL_OTRACER_TOLCD);
-
+// stacktrace start
 		if (cmdv & IOCTL_OTRACER_STACK) {
 			backtrace_test_saved();
 			cmdv &= (~IOCTL_OTRACER_STACK);
@@ -406,6 +412,7 @@ static long otracer_ioctl(struct file *filp,
 			tasks_test_saved();
 			cmdv &= (~IOCTL_OTRACER_ALLINFO);
 		}
+// stacktrace end
 		if (cmdv & IOCTL_OTRACER_PANIC) {
 			pr_info("ioctl panic reboot\n");
 			panic("android");
