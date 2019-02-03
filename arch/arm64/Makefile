@@ -84,8 +84,6 @@ ifeq ($(CONFIG_COMPAT_VDSO), y)
   endif
 endif
 
-KBUILD_CFLAGS	+= -mgeneral-regs-only $(lseinstr) $(vdso32)
-
 brokengasinst := $(call as-instr,1:\n.inst 0\n.rept . - 1b\n\nnop\n.endr\n,,-DCONFIG_BROKEN_GAS_INST=1)
 
 ifneq ($(brokengasinst),)
