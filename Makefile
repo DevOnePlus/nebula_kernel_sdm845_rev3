@@ -351,9 +351,8 @@ POLLY_FLAGS	:= -mllvm -polly \
 		   -mllvm -polly-opt-maximize-bands=yes \
 		   -mllvm -polly-opt-simplify-deps=no \
 		   -mllvm -polly-rtc-max-arrays-per-group=40
-
-OPT_FLAGS	:= -mcpu=kryo -funsafe-math-optimizations -ffast-math \
-		   -fvectorize -fslp-vectorize -lgomp -fopenmp $(POLLY_FLAGS)
+		   
+OPT_FLAGS	:= -mcpu=kryo -funsafe-math-optimizations -fopenmp $(POLLY_FLAGS)
 endif
 
 # Make variables (CC, etc...)
@@ -406,13 +405,14 @@ LINUXINCLUDE	+= $(filter-out $(LINUXINCLUDE),$(USERINCLUDE))
 
 KBUILD_AFLAGS   := -D__ASSEMBLY__
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
-		   -fno-strict-aliasing -fno-common -fshort-wchar \
-		   -Werror-implicit-function-declaration \
-		   -Wno-format-security -ffast-math \
-		   -std=gnu89 $(OPT_FLAGS) $(call cc-option,-fno-PIE)
+                  -fno-strict-aliasing -fno-common -fshort-wchar \
+                  -Werror-implicit-function-declaration \
+                  -Wno-format-security \
+		  -fdiagnostics-color=always -fdiagnostics-show-option \
+                  -std=gnu89 $(call cc-option,-fno-PIE)
 
-KBUILD_CFLAGS +=  -fdiagnostics-color=always -fdiagnostics-show-option \
-                  -Wno-unused-variable -Wno-unused-function \
+## Global Additional CFLAGS:
+KBUILD_CFLAGS +=  -Wno-unused-variable -Wno-unused-function \
                   -Wno-unused-label -Wno-logical-not-parentheses \
                   -Wno-incompatible-pointer-types -Wno-parentheses \
                   -Wno-sizeof-pointer-memaccess -Wno-nonnull \
@@ -423,22 +423,27 @@ ifneq ($(cc-name),clang)
 KBUILD_CFLAGS +=  -Wno-error=implicit-function-declaration -Wno-implicit-function-declaration \
 		  -Wno-error=incompatible-pointer-types -Wno-pointer-sign \
 		  --Wno-missing-attributes -Wno-sizeof-pointer-memaccess \
-		  -Wno-shift-overflow
+		  -Wno-shift-overflow -Wno-switch-unreachable -Wno-maybe-uninitialized \
+                  -Wno-array-bounds -Wno-duplicate-decl-specifier
 
-KBUILD_CFLAGS +=  -Wno-switch-unreachable -Wno-maybe-uninitialized \
-                  -Wno-array-bounds -Wno-duplicate-decl-specifier \
-		  -Wno-stringop-overflow -Wno-misleading-indentation \
+KBUILD_CFLAGS +=  -Wno-stringop-overflow -Wno-misleading-indentation \
 		  -Wno-unused-const-variable -Wno-format-truncation \
 		  -Wno-int-in-bool-context -Wno-format-overflow \
 		  -Wno-tautological-compare -Wno-error=misleading-indentation \
-                  -Wno-memset-transposed-args -Wno-bool-compare \
-		  -Wno-logical-not-parentheses -Wno-discarded-array-qualifiers \
+                  -Wno-memset-transposed-args -Wno-bool-compare
+
+KBUILD_CFLAGS +=  -Wno-logical-not-parentheses -Wno-discarded-array-qualifiers \
 		  -Wno-attributes -Wno-packed-not-aligned -Wno-stringop-truncation \
 		  -mcpu=cortex-a73.cortex-a53 -mtune=cortex-a73.cortex-a53 \
 		  -Wno-bool-operation -Wno-memset-elt-size
+
+KBUILD_CFLAGS +=  -floop-nest-optimize -fgraphite-identity -fgcse-sm \
+		  -ftree-loop-distribution -mno-fix-cortex-a53-835769 \
+		  -fgcse-las -fbranch-target-load-optimize -fipa-pta -ftracer \
+		  -flive-range-shrinkage -fvariable-expansion-in-unroller
 endif
 
-KBUILD_CPPFLAGS := -D__KERNEL__
+KBUILD_CPPFLAGS := -D__KERNEL__ $(OPT_FLAGS)
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS_MODULE  := -DMODULE
@@ -825,9 +830,9 @@ ifdef CONFIG_PROFILE_ALL_BRANCHES
 KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,)
 else
 ifeq ($(cc-name),clang)
-KBUILD_CFLAGS   += -O3
+KBUILD_CFLAGS   += -O3 -g0
 else
-KBUILD_CFLAGS   += -O2
+KBUILD_CFLAGS   += -O2 -g0
 endif
 endif
 endif
